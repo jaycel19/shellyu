@@ -45,6 +45,49 @@ char *slu_read_line() {
   }
 }
 
+const SLU_TOK_BUFFSIZE = 64;
+const SLU_TOK_DELIM = "\t\r\n\a";
+
+char **slu_split_line(char *line) {
+  // declare bufsize
+  int bufsize = LSH_TOK_BUFSIZE, position = 0;
+  // allocate mem for **tokens [], [], []
+  char **tokens = malloc(bufsize * sizeof(char*));
+  // pointer variable to hold token
+  char *token;
+  
+  // display error mem allocation
+  if (!tokens) {
+    fprintf(stderr, "shellyu: Mem allocation error \n);
+    exit(EXIT_FAILURE);
+  }
+  // tokenize words by spaces base on the delim and return pointer to the next token found in the string
+  token = strtok(line, LSH_TOK_DELIM);
+  while (token != NULL) {
+    // assign each token pointer to tokens [token], [token], [token]
+    tokens[position] = token;
+    position++;
+  
+
+    // realloc mem if not enough
+    if (position >= bufsize) {
+      bufsize += LSH_TOK_BUFSIZE;
+      tokens = realloc(tokens, bufsize * sizeof(char*));
+      // display error mem alloc
+      if (!tokens) {
+        fprintf(stderr, "shellyu: Mem allocation error \n);
+        exit(EXIT_FAILURE);
+      }
+    }
+    // to rerun strtok and remember it state
+    token = strtok(NULL, LSH_TOK_DELIM);
+  }
+  // and put NULL on the rest of the mem space
+  tokens[position] = NULL;
+  // finally return tokens
+  return tokens;
+}
+
 void slu_loop(){
   char *line;
   char **args;
