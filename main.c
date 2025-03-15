@@ -88,6 +88,34 @@ char **slu_split_line(char *line) {
   return tokens;
 }
 
+int slu_launch(char **args) {
+  // variable for process id
+  pid_t, pid, wpid;
+  // variable that holds status
+  int status;
+  
+  // copy the process of the parents memory to child
+  pid = fork();
+  if (pid == 0) {
+    // execute program in the child process
+    if (execvp(args[0], args) == -1) {
+      // if exec fail error
+      perror("slu");
+    }
+    exit(EXIT_FAILURE);
+  } else if(pid < 0) {
+    // if fork fails return error
+    perror("slu");
+  } else {
+    // wait for change of state and status if success
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+      // loop until change of status either exit or other status codes
+    } while (!WIFEXCITED(status) && !WIFSIGNALED(status));
+  }
+  return 1;
+}
+
 void slu_loop(){
   char *line;
   char **args;
