@@ -116,6 +116,63 @@ int slu_launch(char **args) {
   return 1;
 }
 
+// built in cmd functions
+int slu_cd(char **args);
+int slu_help(char **args);
+int slu_exit(char **args);
+
+// built in cmd str
+char *builtin_str[] = {
+  "cd",
+  "help",
+  "exit"
+};
+
+// assign each function into the corresponding builtin cmd
+int (*builtin_func[]) (char **) = {
+  &slu_cd;
+  &slu_help;
+  &slu_exit;
+}
+
+// get the number of built in cmd
+int slu_num_builtins() {
+  return sizeof(builtin_str) / sizeof(char*);
+}
+
+// cd cmd function
+int slu_cd(char **args) {
+  if (args[1] == NULL) {
+    fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+  } else {
+    if(chdir(args[1]) != 0) {
+      perror("slu");
+    }
+  }
+  return 1;
+}
+
+// help cmd function
+int slu_help(char **args) {
+  int i;
+
+  printf("Jhun Chester Lalongisip's SLU \n");
+  printf("A custom shell for you \n");
+  printf("Type program names and arguments, and hit enter \n");
+  printf("The following are built in: \n");
+
+  for (i = 0; i < slu_sum_builtins(); i++) {
+      printf(" %s\n", builtin_str[i]);
+  }
+  printf("Use the man command for information on other programs. \n");
+  return 1;
+}
+
+// exit cmd function
+int slu_exit(char **args) {
+  return 0;
+}
+
 void slu_loop(){
   char *line;
   char **args;
