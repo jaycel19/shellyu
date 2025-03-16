@@ -49,7 +49,7 @@ char *slu_read_line() {
 }
 
 #define SLU_TOK_BUFFSIZE 64
-#define SLU_TOK_DELIM "\t\r\n\a"
+#define SLU_TOK_DELIM " \t\r\n\a"
 
 char **slu_split_line(char *line) {
   // declare bufsize
