@@ -5,6 +5,7 @@
 #include <string.h>
 
 #define SLU_RL_BUFFSIZE 1024
+char slu_cdir[] =  "shellyou";
 
 char *slu_read_line() {
   // initialize buffer size
@@ -120,6 +121,13 @@ int slu_launch(char **args) {
   return 1;
 }
 
+int update_cdir(char *dir) {
+  if (strcat(slu_cdir, dir) != 0) {
+    return 0;
+  }
+  return 1;
+}
+
 // built in cmd functions
 int slu_cd(char **args);
 int slu_help(char **args);
@@ -146,10 +154,25 @@ int slu_num_builtins() {
 
 // cd cmd function
 int slu_cd(char **args) {
+  char *new_dir;
+  new_dir = malloc(strlen(args[1]) + 2);
+  
+  if(!new_dir) {
+    fprintf(stderr, "shellyu: Mem allocation error \n");
+    exit(EXIT_FAILURE);
+  }
+
   if (args[1] == NULL) {
     fprintf(stderr, "lsh: expected argument to \"cd\"\n");
   } else {
     if(chdir(args[1]) != 0) {
+      perror("slu");
+    }
+    
+    strcpy(new_dir, "/");
+    strcat(new_dir, args[1]);
+
+    if( update_cdir(new_dir) != 0 ) {
       perror("slu");
     }
   }
@@ -198,7 +221,7 @@ void slu_loop(){
   int status;
   
   do{
-    printf("shellyu> ");
+    printf("%s> ", slu_cdir);
     line = slu_read_line();
     args = slu_split_line(line);
     status = slu_execute(args);
